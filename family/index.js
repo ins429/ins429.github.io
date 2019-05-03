@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
 
-const baseUrl = 'https://ins429.ddns.net:60429/family/images'
+const baseUrl = 'http://ins429.ddns.net:60429/family/images'
 // const baseUrl = 'http://localhost:60429/family/images'
 const buildImgUrl = filename => `${baseUrl}/${filename}`
 const urlParams = new URLSearchParams(window.location.search)
