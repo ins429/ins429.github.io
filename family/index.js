@@ -7,8 +7,10 @@ const baseUrl = 'http://ins429.ddns.net:60429/family/images'
 const buildImgUrl = filename => `${baseUrl}/${filename}`
 const urlParams = new URLSearchParams(window.location.search)
 const admin = urlParams.get('admin')
+const timestamp = () => new Date().getTime()
 
 const Family = () => {
+  const [filename, setFilename] = useState('')
   const [images, setImages] = useState([])
   useEffect(() => {
     const fetchImages = async () => {
@@ -42,8 +44,19 @@ const Family = () => {
         ))}
         {admin && (
           <form action={baseUrl} method="POST" encType="multipart/form-data">
-            <input type="text" name="filename" />
-            <input type="file" name="file" />
+            <input
+              type="text"
+              name="filename"
+              value={filename}
+              onChange={({ target: { value } }) => setFilename(value)}
+            />
+            <input
+              type="file"
+              name="file"
+              onChange={({ target: { files } }) =>
+                setFilename(`${timestamp()}-${files[0].name}`)
+              }
+            />
             <input type="submit" value="submit" />
           </form>
         )}
