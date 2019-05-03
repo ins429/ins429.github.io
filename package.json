@@ -23,7 +23,8 @@
     ]
   },
   "scripts": {
-    "build.family": "parcel build family.dev.html --out-dir ./ --out-file family.html"
+    "start.family": "parcel family/index.html --port 12345",
+    "build.family": "parcel build family/index.html --out-dir ./ --out-file family.html"
   },
   "devDependencies": {
     "@babel/core": "^7.4.4",
