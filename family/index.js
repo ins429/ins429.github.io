@@ -21,7 +21,7 @@ const Image = ({ img }) => {
   return (
     <Paper>
       <img
-        width="200px"
+        width="100%"
         src={buildImgUrl(img)}
         alt={img}
         onClick={() => setOpen(true)}
@@ -34,7 +34,13 @@ const Image = ({ img }) => {
       >
         <DialogContent>
           <Paper>
-            <img height="100%" width="100%" src={buildImgUrl(img)} alt={img} />
+            <img
+              height="100%"
+              width="100%"
+              src={buildImgUrl(img)}
+              alt={img}
+              style={{ 'object-fit': 'contain' }}
+            />
           </Paper>
         </DialogContent>
         <DialogActions>
@@ -65,11 +71,11 @@ const Family = () => {
   }, [])
 
   return (
-    <div>
+    <div style={{ margin: '10px' }}>
       Ethan Suyeon Lee
       <Grid container spacing={24}>
         {images.map(img => (
-          <Grid key={img} item>
+          <Grid key={img} item xs={4} md={3} lg={2}>
             <Image img={img} />
             {admin && (
               <form action={buildImgUrl(img) + '/delete'}>
