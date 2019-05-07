@@ -2,9 +2,12 @@ import React, { Fragment, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
 import Button from '@material-ui/core/Button'
+import DeleteIcon from '@material-ui/icons/Delete'
+import IconButton from '@material-ui/core/IconButton'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
+import TextField from '@material-ui/core/TextField'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 
@@ -79,7 +82,9 @@ const Family = () => {
             <Image img={img} />
             {admin && (
               <form action={buildImgUrl(img) + '/delete'}>
-                <input type="submit" value="delete" />
+                <IconButton size="small" aria-label="Delete">
+                  <DeleteIcon />
+                </IconButton>
               </form>
             )}
           </Grid>
@@ -87,20 +92,30 @@ const Family = () => {
       </Grid>
       {admin && (
         <form action={baseUrl} method="POST" encType="multipart/form-data">
-          <input
-            type="text"
-            name="filename"
+          <TextField
+            label="filename"
             value={filename}
             onChange={({ target: { value } }) => setFilename(value)}
+            margin="normal"
+            variant="outlined"
           />
           <input
+            id="outlined-button-file"
+            accept="image/*"
             type="file"
             name="file"
             onChange={({ target: { files } }) =>
               setFilename(`${timestamp()}-${files[0].name}`)
             }
           />
-          <input type="submit" value="submit" />
+          <label htmlFor="outlined-button-file">
+            <Button size="small" variant="outlined" component="span">
+              Browse...
+            </Button>
+          </label>
+          <Button size="small" variant="outlined" color="primary">
+            Upload
+          </Button>
         </form>
       )}
     </div>
