@@ -11,75 +11,87 @@ import TextField from '@material-ui/core/TextField'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 
+import FolderIcon from '@material-ui/icons/FolderOutlined'
+
+const lsUrl = 'https://ins429.dynu.net:60429/family/ls'
+const mkdirUrl = 'https://ins429.dynu.net:60429/family/mkdir'
 const baseUrl = 'https://ins429.dynu.net:60429/family/images'
-// const baseUrl = 'http://localhost:60429/family/images'
 const buildImgUrl = filename => `${baseUrl}/${filename}`
 const urlParams = new URLSearchParams(window.location.search)
 const admin = urlParams.get('admin')
 const timestamp = () => new Date().getTime()
+const buildFolderUrl = dir =>
+  `https://ins429.dynu.net:60429/family/${dir}/images`
 
-const Image = ({ img }) => {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <Paper>
-      <img
-        width="100%"
-        src={buildImgUrl(img)}
-        alt={img}
-        onClick={() => setOpen(true)}
-      />
-      <Dialog
-        fullWidth
-        maxWidth="lg"
-        open={open}
-        onClose={() => setOpen(false)}
-      >
-        <DialogContent>
-          <Paper>
-            <img
-              height="100%"
-              width="100%"
-              src={buildImgUrl(img)}
-              alt={img}
-              style={{ 'object-fit': 'contain' }}
-            />
-          </Paper>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Paper>
-  )
-}
+const Image = ({ img, setSelectedImg }) => (
+  <Paper>
+    <img
+      width="100%"
+      src={buildImgUrl(img)}
+      alt={img}
+      onClick={() => setSelectedImg(img)}
+    />
+  </Paper>
+)
 
 const Family = () => {
   const [filename, setFilename] = useState('')
   const [images, setImages] = useState([])
-  useEffect(() => {
-    const fetchImages = async () => {
-      const {
-        data: { files }
-      } = await axios.get(baseUrl)
+  const [folders, setFolders] = useState([])
+  const [selectedImg, setSelectedImg] = useState(null)
+  const [selectedFolder, setSelectedFolder] = useState(null)
+  const [folderName, setFolderName] = useState('')
 
-      if (files) {
-        setImages(files)
+  useEffect(() => {
+    const fetchFolders = async () => {
+      const {
+        data: { data: folders }
+      } = await axios.get(lsUrl)
+
+      if (folders) {
+        setFolders(folders)
       }
     }
 
-    fetchImages()
+    fetchFolders()
   }, [])
+  useEffect(
+    () => {
+      const fetchImages = async dir => {
+        const folderUrl = buildFolderUrl(dir)
+        const {
+          data: { files }
+        } = await axios.get(folderUrl)
+
+        if (files) {
+          setImages(files)
+        }
+      }
+
+      if (selectedFolder) {
+        fetchImages(selectedFolder)
+      }
+    },
+    [selectedFolder]
+  )
 
   return (
     <div style={{ margin: '10px' }}>
       Ethan Suyeon Lee
       <Grid container spacing={24}>
+        {folders.map(folder => (
+          <Grid key={folder} item xs={4} md={3} lg={2}>
+            <div onClick={() => setSelectedFolder(folder)}>
+              <FolderIcon />
+              {folder}
+            </div>
+          </Grid>
+        ))}
+      </Grid>
+      <Grid container spacing={24}>
         {images.map(img => (
           <Grid key={img} item xs={4} md={3} lg={2}>
-            <Image img={img} />
+            <Image img={img} setSelectedImg={setSelectedImg} />
             {admin && (
               <form action={buildImgUrl(img) + '/delete'}>
                 <IconButton size="small" aria-label="Delete">
@@ -91,33 +103,101 @@ const Family = () => {
         ))}
       </Grid>
       {admin && (
-        <form action={baseUrl} method="POST" encType="multipart/form-data">
-          <TextField
-            label="filename"
-            value={filename}
-            onChange={({ target: { value } }) => setFilename(value)}
-            margin="normal"
-            variant="outlined"
-          />
-          <input
-            id="outlined-button-file"
-            accept="image/*"
-            type="file"
-            name="file"
-            onChange={({ target: { files } }) =>
-              setFilename(`${timestamp()}-${files[0].name}`)
-            }
-          />
-          <label htmlFor="outlined-button-file">
-            <Button size="small" variant="outlined" component="span">
-              Browse...
+        <Fragment>
+          <form
+            action={buildFolderUrl(selectedFolder)}
+            method="POST"
+            encType="multipart/form-data"
+          >
+            <TextField
+              label="filename"
+              value={filename}
+              onChange={({ target: { value } }) => setFilename(value)}
+              margin="normal"
+              variant="outlined"
+            />
+            <input
+              id="outlined-button-file"
+              accept="image/*"
+              type="file"
+              name="file"
+              onChange={({ target: { files } }) =>
+                setFilename(`${timestamp()}-${files[0].name}`)
+              }
+            />
+            <label htmlFor="outlined-button-file">
+              <Button size="small" variant="outlined" component="span">
+                Browse...
+              </Button>
+            </label>
+            <Button
+              size="small"
+              variant="outlined"
+              color="primary"
+              type="submit"
+            >
+              Upload
             </Button>
-          </label>
-          <Button size="small" variant="outlined" color="primary">
-            Upload
-          </Button>
-        </form>
+          </form>
+          <form action={mkdirUrl} method="POST">
+            <TextField
+              label="dir"
+              name="dir"
+              value={folderName}
+              onChange={({ target: { value } }) => setFolderName(value)}
+              margin="normal"
+              variant="outlined"
+            />
+            <Button
+              size="small"
+              variant="outlined"
+              color="primary"
+              type="submit"
+            >
+              mkdir
+            </Button>
+          </form>
+        </Fragment>
       )}
+      <Dialog
+        fullWidth
+        maxWidth="lg"
+        open={!!selectedImg}
+        onClose={() => setSelectedImg(null)}
+      >
+        <DialogContent>
+          <Paper>
+            <img
+              height="100%"
+              width="100%"
+              src={buildImgUrl(selectedImg)}
+              alt={selectedImg}
+              style={{ objectFit: 'contain' }}
+            />
+          </Paper>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() =>
+              setSelectedImg(images[images.indexOf(selectedImg) - 1])
+            }
+            color="primary"
+          >
+            Prev
+          </Button>
+          <Button
+            onClick={() =>
+              setSelectedImg(images[images.indexOf(selectedImg) + 1])
+            }
+            color="primary"
+          >
+            Next
+          </Button>
+          <Button onClick={() => setSelectedImg(null)} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }
