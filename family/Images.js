@@ -77,7 +77,9 @@ const Images = ({ folder, images, handleBackClick }) => {
         <DialogActions>
           <Button
             onClick={() =>
-              setSelectedImg(images[images.indexOf(selectedImg) - 1])
+              images[images.indexOf(selectedImg) - 1]
+                ? setSelectedImg(images[images.indexOf(selectedImg) - 1])
+                : setSelectedImg(images[images.length - 1])
             }
             color="primary"
           >
@@ -85,7 +87,9 @@ const Images = ({ folder, images, handleBackClick }) => {
           </Button>
           <Button
             onClick={() =>
-              setSelectedImg(images[images.indexOf(selectedImg) + 1])
+              images[images.indexOf(selectedImg) + 1]
+                ? setSelectedImg(images[images.indexOf(selectedImg) + 1])
+                : setSelectedImg(images[0])
             }
             color="primary"
           >
