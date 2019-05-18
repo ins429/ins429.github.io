@@ -7,14 +7,16 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
+import TextField from '@material-ui/core/TextField'
 import Chip from '@material-ui/core/Chip'
 import FolderIcon from '@material-ui/icons/FolderOutlined'
 import GridContainer from './GridContainer'
 import NavBar from './NavBar'
-import { admin } from './utils'
+import { admin, timestamp } from './utils'
 
 const baseUrl = 'https://ins429.dynu.net:60429/family/images'
 const buildImgUrl = filename => `${baseUrl}/${filename}`
+const buildFolderUrl = dir => `https://ins429.dynu.net:60429/family/images`
 
 const Image = ({ img, setSelectedImg }) => (
   <Paper>
@@ -29,6 +31,7 @@ const Image = ({ img, setSelectedImg }) => (
 
 const Images = ({ folder, images, handleBackClick }) => {
   const [selectedImg, setSelectedImg] = useState(null)
+  const [filename, setFilename] = useState('')
 
   return (
     <Fragment>
@@ -100,6 +103,38 @@ const Images = ({ folder, images, handleBackClick }) => {
           </Button>
         </DialogActions>
       </Dialog>
+      {admin && (
+        <form
+          action={buildFolderUrl(folder)}
+          method="POST"
+          encType="multipart/form-data"
+        >
+          <TextField
+            label="filename"
+            value={filename}
+            onChange={({ target: { value } }) => setFilename(value)}
+            margin="normal"
+            variant="outlined"
+          />
+          <input
+            id="outlined-button-file"
+            accept="image/*"
+            type="file"
+            name="file"
+            onChange={({ target: { files } }) =>
+              setFilename(`${timestamp()}-${files[0].name}`)
+            }
+          />
+          <label htmlFor="outlined-button-file">
+            <Button size="small" variant="outlined" component="span">
+              Browse...
+            </Button>
+          </label>
+          <Button size="small" variant="outlined" color="primary" type="submit">
+            Upload
+          </Button>
+        </form>
+      )}
     </Fragment>
   )
 }
