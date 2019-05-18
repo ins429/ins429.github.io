@@ -2,52 +2,34 @@ import React, { Fragment, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
 import Button from '@material-ui/core/Button'
-import DeleteIcon from '@material-ui/icons/Delete'
-import IconButton from '@material-ui/core/IconButton'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogActions from '@material-ui/core/DialogActions'
 import TextField from '@material-ui/core/TextField'
 import Grid from '@material-ui/core/Grid'
-import Paper from '@material-ui/core/Paper'
-
-import FolderIcon from '@material-ui/icons/FolderOutlined'
+import Loader from '@material-ui/core/CircularProgress'
+import Folders from './Folders'
+import Images from './Images'
+import { admin, timestamp } from './utils'
 
 const lsUrl = 'https://ins429.dynu.net:60429/family/ls'
 const mkdirUrl = 'https://ins429.dynu.net:60429/family/mkdir'
 const baseUrl = 'https://ins429.dynu.net:60429/family/images'
-const buildImgUrl = filename => `${baseUrl}/${filename}`
-const urlParams = new URLSearchParams(window.location.search)
-const admin = urlParams.get('admin')
-const timestamp = () => new Date().getTime()
-const buildFolderUrl = dir =>
-  `https://ins429.dynu.net:60429/family/${dir}/images`
-
-const Image = ({ img, setSelectedImg }) => (
-  <Paper>
-    <img
-      width="100%"
-      src={buildImgUrl(img)}
-      alt={img}
-      onClick={() => setSelectedImg(img)}
-    />
-  </Paper>
-)
+const buildFolderUrl = dir => `https://ins429.dynu.net:60429/family/images`
 
 const Family = () => {
+  const [loading, setLoading] = useState(false)
   const [filename, setFilename] = useState('')
   const [images, setImages] = useState([])
   const [folders, setFolders] = useState([])
-  const [selectedImg, setSelectedImg] = useState(null)
   const [selectedFolder, setSelectedFolder] = useState(null)
   const [folderName, setFolderName] = useState('')
 
   useEffect(() => {
     const fetchFolders = async () => {
+      setLoading(true)
       const {
         data: { data: folders }
       } = await axios.get(lsUrl)
 
+      setLoading(false)
       if (folders) {
         setFolders(folders)
       }
@@ -59,9 +41,11 @@ const Family = () => {
     () => {
       const fetchImages = async dir => {
         const folderUrl = buildFolderUrl(dir)
+        setLoading(true)
         const {
           data: { files }
         } = await axios.get(folderUrl)
+        setLoading(false)
 
         if (files) {
           setImages(files)
@@ -76,32 +60,21 @@ const Family = () => {
   )
 
   return (
-    <div style={{ margin: '10px' }}>
-      Ethan Suyeon Lee
-      <Grid container spacing={24}>
-        {folders.map(folder => (
-          <Grid key={folder} item xs={4} md={3} lg={2}>
-            <div onClick={() => setSelectedFolder(folder)}>
-              <FolderIcon />
-              {folder}
-            </div>
-          </Grid>
-        ))}
-      </Grid>
-      <Grid container spacing={24}>
-        {images.map(img => (
-          <Grid key={img} item xs={4} md={3} lg={2}>
-            <Image img={img} setSelectedImg={setSelectedImg} />
-            {admin && (
-              <form action={buildImgUrl(img) + '/delete'}>
-                <IconButton size="small" aria-label="Delete">
-                  <DeleteIcon />
-                </IconButton>
-              </form>
-            )}
-          </Grid>
-        ))}
-      </Grid>
+    <Fragment>
+      {loading ? (
+        <Loader />
+      ) : selectedFolder ? (
+        <Images
+          images={images}
+          folder={selectedFolder}
+          handleBackClick={() => setSelectedFolder(null)}
+        />
+      ) : (
+        <Folders
+          folders={folders}
+          handleFolderClick={folder => () => setSelectedFolder(folder)}
+        />
+      )}
       {admin && (
         <Fragment>
           <form
@@ -159,46 +132,7 @@ const Family = () => {
           </form>
         </Fragment>
       )}
-      <Dialog
-        fullWidth
-        maxWidth="lg"
-        open={!!selectedImg}
-        onClose={() => setSelectedImg(null)}
-      >
-        <DialogContent>
-          <Paper>
-            <img
-              height="100%"
-              width="100%"
-              src={buildImgUrl(selectedImg)}
-              alt={selectedImg}
-              style={{ objectFit: 'contain' }}
-            />
-          </Paper>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() =>
-              setSelectedImg(images[images.indexOf(selectedImg) - 1])
-            }
-            color="primary"
-          >
-            Prev
-          </Button>
-          <Button
-            onClick={() =>
-              setSelectedImg(images[images.indexOf(selectedImg) + 1])
-            }
-            color="primary"
-          >
-            Next
-          </Button>
-          <Button onClick={() => setSelectedImg(null)} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+    </Fragment>
   )
 }
 
