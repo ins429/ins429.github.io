@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import axios from 'axios'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
@@ -35,8 +36,7 @@ const Image = ({ img, setSelectedImg }) => (
 const Images = ({
   match: {
     params: { folder }
-  },
-  handleBackClick
+  }
 }) => {
   const [selectedImg, setSelectedImg] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -79,8 +79,9 @@ const Images = ({
         <Button
           variant="outlined"
           color="primary"
-          onClick={handleBackClick}
           style={{ marginLeft: '10px' }}
+          component={Link}
+          to="/"
         >
           Back
         </Button>
