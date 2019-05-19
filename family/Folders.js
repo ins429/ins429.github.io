@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Grid from '@material-ui/core/Grid'
 import Chip from '@material-ui/core/Chip'
 import Button from '@material-ui/core/Button'
@@ -8,7 +9,7 @@ import NavBar from './NavBar'
 import FolderFormDialog from './FolderFormDialog'
 import { admin } from './utils'
 
-const Folders = ({ folders, handleFolderClick }) => {
+const Folders = ({ folders }) => {
   const [openForm, setOpenForm] = useState(false)
 
   return (
@@ -28,14 +29,15 @@ const Folders = ({ folders, handleFolderClick }) => {
       <GridContainer>
         {folders.map(folder => (
           <Grid key={folder} item xs={4} md={3} lg={2}>
-            <Chip
-              icon={<FolderIcon />}
-              label={folder}
-              onClick={handleFolderClick(folder)}
-              variant="outlined"
-              color="primary"
-              clickable
-            />
+            <Link to={`/${folder}`}>
+              <Chip
+                icon={<FolderIcon />}
+                label={folder}
+                variant="outlined"
+                color="primary"
+                clickable
+              />
+            </Link>
           </Grid>
         ))}
       </GridContainer>

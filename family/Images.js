@@ -1,4 +1,5 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
+import axios from 'axios'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import Button from '@material-ui/core/Button'
@@ -8,6 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
 import TextField from '@material-ui/core/TextField'
+import Loader from '@material-ui/core/CircularProgress'
 import Chip from '@material-ui/core/Chip'
 import FolderIcon from '@material-ui/icons/FolderOutlined'
 import GridContainer from './GridContainer'
@@ -17,6 +19,7 @@ import ImageFormDialog from './ImageFormDialog'
 
 const baseUrl = 'https://ins429.dynu.net:60429/family/images'
 const buildImgUrl = filename => `${baseUrl}/${filename}`
+const buildFolderUrl = dir => `https://ins429.dynu.net:60429/family/images`
 
 const Image = ({ img, setSelectedImg }) => (
   <Paper>
@@ -29,11 +32,37 @@ const Image = ({ img, setSelectedImg }) => (
   </Paper>
 )
 
-const Images = ({ folder, images, handleBackClick }) => {
+const Images = ({
+  match: {
+    params: { folder }
+  },
+  handleBackClick
+}) => {
   const [selectedImg, setSelectedImg] = useState(null)
+  const [loading, setLoading] = useState(false)
   const [openForm, setOpenForm] = useState(false)
+  const [images, setImages] = useState([])
 
-  return (
+  useEffect(() => {
+    const fetchImages = async () => {
+      const folderUrl = buildFolderUrl(folder)
+      setLoading(true)
+      const {
+        data: { files }
+      } = await axios.get(folderUrl)
+      setLoading(false)
+
+      if (files) {
+        setImages(files)
+      }
+    }
+
+    fetchImages()
+  }, [])
+
+  return loading ? (
+    <Loader />
+  ) : (
     <Fragment>
       <NavBar title="Ethan Suyeon Lee - Images">
         <Chip icon={<FolderIcon />} label={folder} variant="outlined" />
