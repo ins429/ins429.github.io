@@ -12,11 +12,11 @@ import Chip from '@material-ui/core/Chip'
 import FolderIcon from '@material-ui/icons/FolderOutlined'
 import GridContainer from './GridContainer'
 import NavBar from './NavBar'
-import { admin, timestamp } from './utils'
+import { admin } from './utils'
+import ImageFormDialog from './ImageFormDialog'
 
 const baseUrl = 'https://ins429.dynu.net:60429/family/images'
 const buildImgUrl = filename => `${baseUrl}/${filename}`
-const buildFolderUrl = dir => `https://ins429.dynu.net:60429/family/images`
 
 const Image = ({ img, setSelectedImg }) => (
   <Paper>
@@ -31,12 +31,22 @@ const Image = ({ img, setSelectedImg }) => (
 
 const Images = ({ folder, images, handleBackClick }) => {
   const [selectedImg, setSelectedImg] = useState(null)
-  const [filename, setFilename] = useState('')
+  const [openForm, setOpenForm] = useState(false)
 
   return (
     <Fragment>
       <NavBar title="Ethan Suyeon Lee - Images">
         <Chip icon={<FolderIcon />} label={folder} variant="outlined" />
+        {admin && (
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => setOpenForm(true)}
+            style={{ marginLeft: '10px' }}
+          >
+            New Image
+          </Button>
+        )}
         <Button
           variant="outlined"
           color="primary"
@@ -103,38 +113,11 @@ const Images = ({ folder, images, handleBackClick }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      {admin && (
-        <form
-          action={buildFolderUrl(folder)}
-          method="POST"
-          encType="multipart/form-data"
-        >
-          <TextField
-            label="filename"
-            value={filename}
-            onChange={({ target: { value } }) => setFilename(value)}
-            margin="normal"
-            variant="outlined"
-          />
-          <input
-            id="outlined-button-file"
-            accept="image/*"
-            type="file"
-            name="file"
-            onChange={({ target: { files } }) =>
-              setFilename(`${timestamp()}-${files[0].name}`)
-            }
-          />
-          <label htmlFor="outlined-button-file">
-            <Button size="small" variant="outlined" component="span">
-              Browse...
-            </Button>
-          </label>
-          <Button size="small" variant="outlined" color="primary" type="submit">
-            Upload
-          </Button>
-        </form>
-      )}
+      <ImageFormDialog
+        folder={folder}
+        open={openForm}
+        handleClose={() => setOpenForm(false)}
+      />
     </Fragment>
   )
 }

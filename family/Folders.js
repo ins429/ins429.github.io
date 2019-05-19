@@ -3,19 +3,28 @@ import Grid from '@material-ui/core/Grid'
 import Chip from '@material-ui/core/Chip'
 import Button from '@material-ui/core/Button'
 import FolderIcon from '@material-ui/icons/FolderOutlined'
-import TextField from '@material-ui/core/TextField'
 import GridContainer from './GridContainer'
 import NavBar from './NavBar'
+import FolderFormDialog from './FolderFormDialog'
 import { admin } from './utils'
 
-const mkdirUrl = 'https://ins429.dynu.net:60429/family/mkdir'
-
 const Folders = ({ folders, handleFolderClick }) => {
-  const [folderName, setFolderName] = useState('')
+  const [openForm, setOpenForm] = useState(false)
 
   return (
     <Fragment>
-      <NavBar title="Ethan Suyeon Lee - Folders" />
+      <NavBar title="Ethan Suyeon Lee - Folders">
+        {admin && (
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => setOpenForm(true)}
+            style={{ marginLeft: '10px' }}
+          >
+            New Folder
+          </Button>
+        )}
+      </NavBar>
       <GridContainer>
         {folders.map(folder => (
           <Grid key={folder} item xs={4} md={3} lg={2}>
@@ -30,22 +39,10 @@ const Folders = ({ folders, handleFolderClick }) => {
           </Grid>
         ))}
       </GridContainer>
-
-      {admin && (
-        <form action={mkdirUrl} method="POST">
-          <TextField
-            label="dir"
-            name="dir"
-            value={folderName}
-            onChange={({ target: { value } }) => setFolderName(value)}
-            margin="normal"
-            variant="outlined"
-          />
-          <Button size="small" variant="outlined" color="primary" type="submit">
-            mkdir
-          </Button>
-        </form>
-      )}
+      <FolderFormDialog
+        open={openForm}
+        handleClose={() => setOpenForm(false)}
+      />
     </Fragment>
   )
 }
