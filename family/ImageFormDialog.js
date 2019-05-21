@@ -11,7 +11,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import { timestamp } from './utils'
 
-const buildFolderUrl = dir => `https://ins429.dynu.net:60429/family/images`
+const buildFolderUrl = dir => `https://ins429.dynu.net:60429/family/${dir}`
 
 const styles = {
   root: {

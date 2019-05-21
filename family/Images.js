@@ -18,15 +18,16 @@ import NavBar from './NavBar'
 import { admin } from './utils'
 import ImageFormDialog from './ImageFormDialog'
 
-const baseUrl = 'https://ins429.dynu.net:60429/family/images'
-const buildImgUrl = filename => `${baseUrl}/${filename}`
-const buildFolderUrl = dir => `https://ins429.dynu.net:60429/family/images`
+const baseUrl = 'https://ins429.dynu.net:60429/family'
+const buildImgUrl = (folder, filename) => `${baseUrl}/${folder}/${filename}`
+const buildFolderUrl = folder =>
+  `https://ins429.dynu.net:60429/family/${folder}/images`
 
-const Image = ({ img, setSelectedImg }) => (
+const Image = ({ folder, img, setSelectedImg }) => (
   <Paper>
     <img
       width="100%"
-      src={buildImgUrl(img)}
+      src={buildImgUrl(folder, img)}
       alt={img}
       onClick={() => setSelectedImg(img)}
     />
@@ -48,12 +49,12 @@ const Images = ({
       const folderUrl = buildFolderUrl(folder)
       setLoading(true)
       const {
-        data: { files }
+        data: { data }
       } = await axios.get(folderUrl)
       setLoading(false)
 
-      if (files) {
-        setImages(files)
+      if (data) {
+        setImages(data)
       }
     }
 
@@ -89,9 +90,9 @@ const Images = ({
       <GridContainer>
         {images.map(img => (
           <Grid key={img} item xs={4} md={3} lg={2}>
-            <Image img={img} setSelectedImg={setSelectedImg} />
+            <Image folder={folder} img={img} setSelectedImg={setSelectedImg} />
             {admin && (
-              <form action={buildImgUrl(img) + '/delete'}>
+              <form action={buildImgUrl(folder, img) + '/delete'}>
                 <IconButton size="small" aria-label="Delete">
                   <DeleteIcon />
                 </IconButton>
@@ -111,7 +112,7 @@ const Images = ({
             <img
               height="100%"
               width="100%"
-              src={buildImgUrl(selectedImg)}
+              src={buildImgUrl(folder, selectedImg)}
               alt={selectedImg}
               style={{ objectFit: 'contain' }}
             />
