@@ -93,7 +93,7 @@ const Images = ({
             <Image folder={folder} img={img} setSelectedImg={setSelectedImg} />
             {admin && (
               <form action={buildImgUrl(folder, img) + '/delete'}>
-                <IconButton size="small" aria-label="Delete">
+                <IconButton size="small" aria-label="Delete" type="submit">
                   <DeleteIcon />
                 </IconButton>
               </form>
