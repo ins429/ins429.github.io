@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 import Grid from '@material-ui/core/Grid'
 import Chip from '@material-ui/core/Chip'
 import Button from '@material-ui/core/Button'
@@ -9,7 +10,9 @@ import NavBar from './NavBar'
 import FolderFormDialog from './FolderFormDialog'
 import { admin } from './utils'
 
-const Folders = ({ folders }) => {
+const mkdirUrl = 'https://ins429.dynu.net:60429/family/mkdir'
+
+const Folders = ({ folders, reload }) => {
   const [openForm, setOpenForm] = useState(false)
 
   return (
@@ -27,9 +30,9 @@ const Folders = ({ folders }) => {
         )}
       </NavBar>
       <GridContainer>
-        {folders.map(folder => (
+        {folders.sort().map(folder => (
           <Grid key={folder} item xs={4} md={3} lg={2}>
-            <Link to={`/${folder}`}>
+            <Link to={`/${folder}?admin=${admin}`}>
               <Chip
                 icon={<FolderIcon />}
                 label={folder}
@@ -44,6 +47,10 @@ const Folders = ({ folders }) => {
       <FolderFormDialog
         open={openForm}
         handleClose={() => setOpenForm(false)}
+        handleSubmit={folderName => {
+          axios.post(mkdirUrl, { dir: folderName })
+          reload()
+        }}
       />
     </Fragment>
   )

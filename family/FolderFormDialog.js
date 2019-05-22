@@ -25,12 +25,19 @@ const styles = {
   }
 }
 
-const FolderFormDialog = ({ open, handleClose, classes }) => {
+const FolderFormDialog = ({ open, handleClose, classes, handleSubmit }) => {
   const [folderName, setFolderName] = useState('')
 
   return (
     <Dialog fullWidth maxWidth="md" open={open} onClose={handleClose}>
-      <form action={mkdirUrl} method="POST">
+      <form
+        action={mkdirUrl}
+        method="POST"
+        onSubmit={e => {
+          e.preventDefault()
+          handleSubmit(folderName)
+        }}
+      >
         <DialogTitle disableTypography className={classes.root}>
           <Typography variant="h6">New folder</Typography>
           <IconButton

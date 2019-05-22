@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import Grid from '@material-ui/core/Grid'
@@ -15,8 +15,9 @@ import Chip from '@material-ui/core/Chip'
 import FolderIcon from '@material-ui/icons/FolderOutlined'
 import GridContainer from './GridContainer'
 import NavBar from './NavBar'
-import { admin } from './utils'
 import ImageFormDialog from './ImageFormDialog'
+import { UploaderManager } from './UploaderContext'
+import { admin } from './utils'
 
 const baseUrl = 'https://ins429.dynu.net:60429/family'
 const buildImgUrl = (folder, filename) => `${baseUrl}/${folder}/${filename}`
@@ -64,7 +65,7 @@ const Images = ({
   return loading ? (
     <Loader />
   ) : (
-    <Fragment>
+    <UploaderManager>
       <NavBar title="Ethan Suyeon Lee - Images">
         <Chip icon={<FolderIcon />} label={folder} variant="outlined" />
         {admin && (
@@ -92,7 +93,14 @@ const Images = ({
           <Grid key={img} item xs={4} md={3} lg={2}>
             <Image folder={folder} img={img} setSelectedImg={setSelectedImg} />
             {admin && (
-              <form action={buildImgUrl(folder, img) + '/delete'}>
+              <form
+                action={buildImgUrl(folder, img)}
+                onSubmit={e => {
+                  e.preventDefault()
+                  axios.delete(`${buildImgUrl(folder, img)}`)
+                  setImages(images.filter(image => image !== img))
+                }}
+              >
                 <IconButton size="small" aria-label="Delete" type="submit">
                   <DeleteIcon />
                 </IconButton>
@@ -149,7 +157,7 @@ const Images = ({
         open={openForm}
         handleClose={() => setOpenForm(false)}
       />
-    </Fragment>
+    </UploaderManager>
   )
 }
 
