@@ -31,7 +31,7 @@ const Folders = ({ folders, reload }) => {
       </NavBar>
       <GridContainer>
         {folders.sort().map(folder => (
-          <Grid key={folder} item xs={4} md={3} lg={2}>
+          <Grid key={folder} item xs={12} md={3} lg={2}>
             <Link to={`/${folder}?admin=${admin}`}>
               <Chip
                 icon={<FolderIcon />}
