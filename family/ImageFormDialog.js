@@ -10,6 +10,11 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import FormControl from '@material-ui/core/FormControl'
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
 import { timestamp } from './utils'
 import UploaderContext from './UploaderContext'
 import UploadJob from './UploadJob'
@@ -29,11 +34,15 @@ const styles = {
   },
   fileInput: {
     display: 'none'
+  },
+  browseButton: {
+    marginTop: '5px'
   }
 }
 
 const ImageFormDialog = ({ folder, open, handleClose, classes }) => {
   const [files, setFiles] = useState([])
+  const [password, setPassword] = useState('')
   const { enqueue, reload, jobs } = useContext(UploaderContext)
   const form = useRef(null)
 
@@ -52,10 +61,12 @@ const ImageFormDialog = ({ folder, open, handleClose, classes }) => {
 
             formData.append('filename', file.filename)
             formData.append('file', file.file, file.filename)
+            formData.append('password', password)
 
             enqueue(
               new UploadJob({
                 url: buildFolderUrl(folder),
+                filename: file.filename,
                 formData
               })
             )
@@ -91,6 +102,16 @@ const ImageFormDialog = ({ folder, open, handleClose, classes }) => {
               variant="outlined"
             />
           ))}
+          <TextField
+            fullWidth
+            type="password"
+            label="Password"
+            name="password"
+            value={password}
+            onChange={({ target: { value } }) => setPassword(value)}
+            margin="normal"
+            variant="outlined"
+          />
           <FormControl>
             <input
               id="outlined-button-file"
@@ -116,12 +137,36 @@ const ImageFormDialog = ({ folder, open, handleClose, classes }) => {
               className={classes.fileInput}
             />
             <label htmlFor="outlined-button-file">
-              <Button size="small" variant="outlined" component="span">
+              <Button
+                size="small"
+                variant="outlined"
+                component="span"
+                className={classes.browseButton}
+              >
                 Browse...
               </Button>
             </label>
           </FormControl>
-          <p>{JSON.stringify(jobs)}</p>
+          <Table className={classes.table}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Filename</TableCell>
+                <TableCell align="right">Status</TableCell>
+                <TableCell align="right">Progress</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {jobs.map(job => (
+                <TableRow key={job.id}>
+                  <TableCell component="th" scope="row">
+                    {job.filename}
+                  </TableCell>
+                  <TableCell align="right">{job.status}</TableCell>
+                  <TableCell align="right">{job.progress}%</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </DialogContent>
         <DialogActions>
           <Button size="small" variant="outlined" color="primary" type="submit">

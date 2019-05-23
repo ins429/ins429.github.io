@@ -8,11 +8,10 @@ import FolderIcon from '@material-ui/icons/FolderOutlined'
 import GridContainer from './GridContainer'
 import NavBar from './NavBar'
 import FolderFormDialog from './FolderFormDialog'
-import { admin } from './utils'
 
 const mkdirUrl = 'https://ins429.dynu.net:60429/family/mkdir'
 
-const Folders = ({ folders, reload }) => {
+const Folders = ({ admin, folders, reload }) => {
   const [openForm, setOpenForm] = useState(false)
 
   return (
@@ -32,7 +31,7 @@ const Folders = ({ folders, reload }) => {
       <GridContainer>
         {folders.sort().map(folder => (
           <Grid key={folder} item xs={12} md={3} lg={2}>
-            <Link to={`/${folder}?admin=${admin}`}>
+            <Link to={admin ? `/admin/${folder}` : `/${folder}`}>
               <Chip
                 icon={<FolderIcon />}
                 label={folder}
@@ -47,8 +46,8 @@ const Folders = ({ folders, reload }) => {
       <FolderFormDialog
         open={openForm}
         handleClose={() => setOpenForm(false)}
-        handleSubmit={folderName => {
-          axios.post(mkdirUrl, { dir: folderName })
+        handleSubmit={(folderName, password) => {
+          axios.post(mkdirUrl, { dir: folderName, password })
           reload()
         }}
       />

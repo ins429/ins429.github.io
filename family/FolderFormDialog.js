@@ -27,6 +27,7 @@ const styles = {
 
 const FolderFormDialog = ({ open, handleClose, classes, handleSubmit }) => {
   const [folderName, setFolderName] = useState('')
+  const [password, setPassword] = useState('')
 
   return (
     <Dialog fullWidth maxWidth="md" open={open} onClose={handleClose}>
@@ -35,7 +36,7 @@ const FolderFormDialog = ({ open, handleClose, classes, handleSubmit }) => {
         method="POST"
         onSubmit={e => {
           e.preventDefault()
-          handleSubmit(folderName)
+          handleSubmit(folderName, password)
         }}
       >
         <DialogTitle disableTypography className={classes.root}>
@@ -55,6 +56,16 @@ const FolderFormDialog = ({ open, handleClose, classes, handleSubmit }) => {
             name="dir"
             value={folderName}
             onChange={({ target: { value } }) => setFolderName(value)}
+            margin="normal"
+            variant="outlined"
+          />
+          <TextField
+            fullWidth
+            type="password"
+            label="Password"
+            name="password"
+            value={password}
+            onChange={({ target: { value } }) => setPassword(value)}
             margin="normal"
             variant="outlined"
           />

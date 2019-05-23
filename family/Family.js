@@ -8,7 +8,7 @@ import Images from './Images'
 const lsUrl = 'https://ins429.dynu.net:60429/family/ls'
 const buildFolderUrl = dir => `https://ins429.dynu.net:60429/family/images`
 
-const Family = () => {
+const Family = ({ admin }) => {
   const [count, setCount] = useState(1)
   const [loading, setLoading] = useState(false)
   const [filename, setFilename] = useState('')
@@ -36,7 +36,11 @@ const Family = () => {
   return loading ? (
     <Loader />
   ) : (
-    <Folders folders={folders} reload={() => setCount(count + 1)} />
+    <Folders
+      admin={admin}
+      folders={folders}
+      reload={() => setCount(count + 1)}
+    />
   )
 }
 

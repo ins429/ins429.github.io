@@ -43,9 +43,10 @@ class UploadJob extends Job {
   constructor(args = {}) {
     super(args)
 
-    const { url, formData, progress = 0 } = args
+    const { filename, url, formData, progress = 0 } = args
 
     this.url = url
+    this.filename = filename
     this.formData = formData
     this.progress = progress
     this.request = new XMLHttpRequest()

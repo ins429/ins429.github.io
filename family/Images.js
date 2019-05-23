@@ -17,10 +17,19 @@ import GridContainer from './GridContainer'
 import NavBar from './NavBar'
 import ImageFormDialog from './ImageFormDialog'
 import { UploaderManager } from './UploaderContext'
-import { admin } from './utils'
 
 const baseUrl = 'https://ins429.dynu.net:60429/family'
 const buildImgUrl = (folder, filename) => `${baseUrl}/${folder}/${filename}`
+const buildFullImageUrl = (folder, filename) => {
+  if (!filename) {
+    return ''
+  }
+  const tokens = filename.split('.')
+
+  return `${baseUrl}/${folder}/${tokens
+    .filter(token => token !== 'thumb')
+    .join('.')}`
+}
 const buildFolderUrl = folder =>
   `https://ins429.dynu.net:60429/family/${folder}/images`
 
@@ -38,7 +47,8 @@ const Image = ({ folder, img, setSelectedImg }) => (
 const Images = ({
   match: {
     params: { folder }
-  }
+  },
+  admin
 }) => {
   const [selectedImg, setSelectedImg] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -83,31 +93,38 @@ const Images = ({
           color="primary"
           style={{ marginLeft: '10px' }}
           component={Link}
-          to="/"
+          to={admin ? '/admin' : '/'}
         >
           Back
         </Button>
       </NavBar>
       <GridContainer>
-        {images.map(img => (
-          <Grid key={img} item xs={4} md={3} lg={2}>
-            <Image folder={folder} img={img} setSelectedImg={setSelectedImg} />
-            {admin && (
-              <form
-                action={buildImgUrl(folder, img)}
-                onSubmit={e => {
-                  e.preventDefault()
-                  axios.delete(`${buildImgUrl(folder, img)}`)
-                  setImages(images.filter(image => image !== img))
-                }}
-              >
-                <IconButton size="small" aria-label="Delete" type="submit">
-                  <DeleteIcon />
-                </IconButton>
-              </form>
-            )}
-          </Grid>
-        ))}
+        {images
+          .filter(img => img.indexOf('.thumb') > -1)
+          .map(img => (
+            <Grid key={img} item xs={4} md={3} lg={2}>
+              <Image
+                folder={folder}
+                img={img}
+                setSelectedImg={setSelectedImg}
+              />
+              {admin && (
+                <form
+                  action={buildImgUrl(folder, img)}
+                  onSubmit={e => {
+                    e.preventDefault()
+                    const password = window.prompt('Password?')
+                    axios.delete(`${buildImgUrl(folder, img)}`, { password })
+                    setImages(images.filter(image => image !== img))
+                  }}
+                >
+                  <IconButton size="small" aria-label="Delete" type="submit">
+                    <DeleteIcon />
+                  </IconButton>
+                </form>
+              )}
+            </Grid>
+          ))}
       </GridContainer>
       <Dialog
         fullWidth
@@ -120,7 +137,7 @@ const Images = ({
             <img
               height="100%"
               width="100%"
-              src={buildImgUrl(folder, selectedImg)}
+              src={buildFullImageUrl(folder, selectedImg)}
               alt={selectedImg}
               style={{ objectFit: 'contain' }}
             />
