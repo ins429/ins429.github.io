@@ -114,7 +114,9 @@ const Images = ({
                   onSubmit={e => {
                     e.preventDefault()
                     const password = window.prompt('Password?')
-                    axios.delete(`${buildImgUrl(folder, img)}`, { password })
+                    axios.delete(`${buildImgUrl(folder, img)}`, {
+                      data: { password }
+                    })
                     setImages(images.filter(image => image !== img))
                   }}
                 >
