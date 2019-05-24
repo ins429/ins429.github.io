@@ -105,7 +105,7 @@ const ImageFormDialog = ({
           {files.map((file, index) => (
             <Grid key={index} container alignItems="center">
               <Grid item xs={2}>
-                <img src={src[id]} alt={file.filename} height="100" />
+                <img src={src[file.id]} alt={file.filename} height="100" />
               </Grid>
               <Grid item xs={8}>
                 <TextField
@@ -164,18 +164,22 @@ const ImageFormDialog = ({
 
                 for (let i = 0; i < _files.length; i++) {
                   const reader = new FileReader()
+                  const fileId = btoa(`file:${id}`)
 
                   reader.readAsDataURL(_files[i])
                   reader.addEventListener(
                     'load',
-                    () => setSrc({ ...src, [id]: reader.result }),
+                    (fileId => () =>
+                      setSrc(src => ({ ...src, [fileId]: reader.result })))(
+                      fileId
+                    ),
                     false
                   )
 
                   newFiles = [
                     ...newFiles,
                     {
-                      id,
+                      id: fileId,
                       file: _files[i],
                       filename: `${timestamp()}-${_files[i].name}`
                     }
