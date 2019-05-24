@@ -61,9 +61,17 @@ class UploadJob extends Job {
   async perform() {
     const { url, formData, request, handleAbort, handleUploadProgress } = this
 
-    await upload({ url, formData, request, handleAbort, handleUploadProgress })
+    await upload({
+      url,
+      formData,
+      request,
+      handleAbort,
+      handleUploadProgress
+    })
 
-    return { result: 'ok' }
+    return request.status === 201
+      ? { result: 'ok' }
+      : { error: request.statusText }
   }
 
   abort() {
@@ -80,7 +88,7 @@ class UploadJob extends Job {
   }
 
   handleUploadProgress(e) {
-    const progress = floorToHundredth(parseInt((e.loaded / e.total) * 100, 10))
+    const progress = floorToHundredth(parseInt(e.loaded / e.total * 100, 10))
 
     if (progress !== this.progress) {
       this.updateProgress(progress)

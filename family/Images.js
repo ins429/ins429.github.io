@@ -20,6 +20,11 @@ import { UploaderManager } from './UploaderContext'
 
 const baseUrl = 'https://ins429.dynu.net:60429/family'
 const buildImgUrl = (folder, filename) => `${baseUrl}/${folder}/${filename}`
+const buildThumbnail = filename => {
+  const tokens = filename.split('.')
+
+  return [...tokens.slice(0, -1), 'thumb', tokens[tokens.length - 1]].join('.')
+}
 const buildFullImageUrl = (folder, filename) => {
   if (!filename) {
     return ''
@@ -72,6 +77,7 @@ const Images = ({
     fetchImages()
   }, [])
 
+  console.log(images)
   return loading ? (
     <Loader />
   ) : (
@@ -99,34 +105,28 @@ const Images = ({
         </Button>
       </NavBar>
       <GridContainer>
-        {images
-          .filter(img => img.indexOf('.thumb') > -1)
-          .map(img => (
-            <Grid key={img} item xs={4} md={3} lg={2}>
-              <Image
-                folder={folder}
-                img={img}
-                setSelectedImg={setSelectedImg}
-              />
-              {admin && (
-                <form
-                  action={buildImgUrl(folder, img)}
-                  onSubmit={e => {
-                    e.preventDefault()
-                    const password = window.prompt('Password?')
-                    axios.delete(`${buildFullImageUrl(folder, img)}`, {
-                      data: { password }
-                    })
-                    setImages(images.filter(image => image !== img))
-                  }}
-                >
-                  <IconButton size="small" aria-label="Delete" type="submit">
-                    <DeleteIcon />
-                  </IconButton>
-                </form>
-              )}
-            </Grid>
-          ))}
+        {images.filter(img => img.indexOf('.thumb') > -1).map(img => (
+          <Grid key={img} item xs={4} md={3} lg={2}>
+            <Image folder={folder} img={img} setSelectedImg={setSelectedImg} />
+            {admin && (
+              <form
+                action={buildImgUrl(folder, img)}
+                onSubmit={e => {
+                  e.preventDefault()
+                  const password = window.prompt('Password?')
+                  axios.delete(`${buildFullImageUrl(folder, img)}`, {
+                    data: { password }
+                  })
+                  setImages(images.filter(image => image !== img))
+                }}
+              >
+                <IconButton size="small" aria-label="Delete" type="submit">
+                  <DeleteIcon />
+                </IconButton>
+              </form>
+            )}
+          </Grid>
+        ))}
       </GridContainer>
       <Dialog
         fullWidth
@@ -175,6 +175,12 @@ const Images = ({
         folder={folder}
         open={openForm}
         handleClose={() => setOpenForm(false)}
+        handleImageUpload={filename =>
+          setTimeout(
+            () => setImages(images.concat(buildThumbnail(filename))),
+            3000
+          )
+        }
       />
     </UploaderManager>
   )

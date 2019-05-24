@@ -1,10 +1,12 @@
 import React, { useContext, useState, useRef } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
+import DeleteIcon from '@material-ui/icons/Delete'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -39,15 +41,23 @@ const styles = {
     marginTop: '5px'
   }
 }
+let id = 0
 
-const ImageFormDialog = ({ folder, open, handleClose, classes }) => {
+const ImageFormDialog = ({
+  folder,
+  open,
+  handleClose,
+  handleImageUpload,
+  classes
+}) => {
   const [files, setFiles] = useState([])
+  const [src, setSrc] = useState({})
   const [password, setPassword] = useState('')
   const { enqueue, reload, jobs } = useContext(UploaderContext)
   const form = useRef(null)
 
   return (
-    <Dialog fullWidth maxWidth="md" open={open} onClose={handleClose}>
+    <Dialog fullScreen maxWidth="md" open={open} onClose={handleClose}>
       <form
         ref={form}
         action={buildFolderUrl(folder)}
@@ -67,10 +77,18 @@ const ImageFormDialog = ({ folder, open, handleClose, classes }) => {
               new UploadJob({
                 url: buildFolderUrl(folder),
                 filename: file.filename,
+                finalize: ({ error, result }) => {
+                  if (result) {
+                    handleImageUpload(file.filename)
+                  } else {
+                    alert('Invalid password')
+                  }
+                },
                 formData
               })
             )
           })
+          setFiles([])
         }}
       >
         <DialogTitle disableTypography className={classes.root}>
@@ -85,22 +103,44 @@ const ImageFormDialog = ({ folder, open, handleClose, classes }) => {
         </DialogTitle>
         <DialogContent>
           {files.map((file, index) => (
-            <TextField
-              key={index}
-              fullWidth
-              name="filename"
-              label="Filename"
-              value={file.filename}
-              onChange={({ target: { value } }) =>
-                setFiles(
-                  files.map(_file, _index =>
-                    index === _index ? { ...file, filename: value } : _file
-                  )
-                )
-              }
-              margin="normal"
-              variant="outlined"
-            />
+            <Grid key={index} container alignItems="center">
+              <Grid item xs={2}>
+                <img src={src[id]} alt={file.filename} height="100" />
+              </Grid>
+              <Grid item xs={8}>
+                <TextField
+                  fullWidth
+                  key={index}
+                  name="filename"
+                  label="Filename"
+                  value={file.filename}
+                  onChange={({ target: { value } }) =>
+                    setFiles(
+                      files.map(
+                        _file,
+                        _index =>
+                          index === _index
+                            ? { ...file, filename: value }
+                            : _file
+                      )
+                    )
+                  }
+                  margin="normal"
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item xs={2}>
+                <IconButton
+                  size="small"
+                  aria-label="Delete"
+                  onClick={() =>
+                    setFiles(files.filter(_file => _file.id !== file.id))
+                  }
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Grid>
+            </Grid>
           ))}
           <TextField
             fullWidth
@@ -119,20 +159,31 @@ const ImageFormDialog = ({ folder, open, handleClose, classes }) => {
               multiple
               type="file"
               name="file"
-              onChange={({ target: { files } }) => {
+              onChange={({ target: { files: _files } }) => {
                 let newFiles = []
 
-                for (let i = 0; i < files.length; i++) {
+                for (let i = 0; i < _files.length; i++) {
+                  const reader = new FileReader()
+
+                  reader.readAsDataURL(_files[i])
+                  reader.addEventListener(
+                    'load',
+                    () => setSrc({ ...src, [id]: reader.result }),
+                    false
+                  )
+
                   newFiles = [
                     ...newFiles,
                     {
-                      file: files[i],
-                      filename: `${timestamp()}-${files[i].name}`
+                      id,
+                      file: _files[i],
+                      filename: `${timestamp()}-${_files[i].name}`
                     }
                   ]
+                  id++
                 }
 
-                setFiles(newFiles)
+                setFiles(files.concat(newFiles))
               }}
               className={classes.fileInput}
             />
