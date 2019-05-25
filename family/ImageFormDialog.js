@@ -109,9 +109,9 @@ const ImageFormDialog = ({
         </DialogTitle>
         <DialogContent>
           {files.map((file, index) => (
-            <Grid key={index} container alignItems="center">
+            <Grid key={index} container alignItems="center" spacing={8}>
               <Grid item xs={2}>
-                <img src={src[file.id]} alt={file.filename} height="100" />
+                <img src={src[file.id]} alt={file.filename} width="100%" />
               </Grid>
               <Grid item xs={8}>
                 <TextField
