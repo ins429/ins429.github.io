@@ -9,7 +9,7 @@ const NotFound = () => <div>Not found</div>
 const ErrorPage = () => <div>Something went wrong</div>
 
 const FamilyApp = () => (
-  <Router basename="/family">
+  <Router>
     <Switch>
       <Route path="/" exact component={Family} />
       <Route
