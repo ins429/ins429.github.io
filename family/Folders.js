@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom'
 import axios from 'axios'
 import Grid from '@material-ui/core/Grid'
 import Chip from '@material-ui/core/Chip'
-import Button from '@material-ui/core/Button'
+import IconButton from '@material-ui/core/IconButton'
 import FolderIcon from '@material-ui/icons/FolderOutlined'
+import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder'
 import GridContainer from './GridContainer'
 import NavBar from './NavBar'
 import FolderFormDialog from './FolderFormDialog'
@@ -18,14 +19,13 @@ const Folders = ({ admin, folders, reload }) => {
     <Fragment>
       <NavBar title="Ethan Suyeon Lee - Folders">
         {admin && (
-          <Button
-            variant="outlined"
+          <IconButton
             color="primary"
             onClick={() => setOpenForm(true)}
             style={{ marginLeft: '10px' }}
           >
-            New Folder
-          </Button>
+            <CreateNewFolderIcon />
+          </IconButton>
         )}
       </NavBar>
       <GridContainer>

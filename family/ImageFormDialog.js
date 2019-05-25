@@ -57,7 +57,13 @@ const ImageFormDialog = ({
   const form = useRef(null)
 
   return (
-    <Dialog fullScreen maxWidth="md" open={open} onClose={handleClose}>
+    <Dialog
+      fullScreen
+      scroll="body"
+      maxWidth="md"
+      open={open}
+      onClose={handleClose}
+    >
       <form
         ref={form}
         action={buildFolderUrl(folder)}

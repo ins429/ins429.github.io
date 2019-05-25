@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import { withStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import Button from '@material-ui/core/Button'
@@ -9,6 +10,8 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
+import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import AddAPhotoIcon from '@material-ui/icons/AddAPhoto'
 import TextField from '@material-ui/core/TextField'
 import Loader from '@material-ui/core/CircularProgress'
 import Chip from '@material-ui/core/Chip'
@@ -17,6 +20,12 @@ import GridContainer from './GridContainer'
 import NavBar from './NavBar'
 import ImageFormDialog from './ImageFormDialog'
 import { UploaderManager } from './UploaderContext'
+
+const styles = {
+  imageDialog: {
+    background: 'black'
+  }
+}
 
 const baseUrl = 'https://ins429.dynu.net:60429/family'
 const buildImgUrl = (folder, filename) => `${baseUrl}/${folder}/${filename}`
@@ -53,7 +62,8 @@ const Images = ({
   match: {
     params: { folder }
   },
-  admin
+  admin,
+  classes
 }) => {
   const [selectedImg, setSelectedImg] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -77,32 +87,32 @@ const Images = ({
     fetchImages()
   }, [])
 
-  console.log(images)
   return loading ? (
     <Loader />
   ) : (
     <UploaderManager>
-      <NavBar title="Ethan Suyeon Lee - Images">
+      <NavBar title="Images">
         <Chip icon={<FolderIcon />} label={folder} variant="outlined" />
         {admin && (
-          <Button
-            variant="outlined"
+          <IconButton
             color="primary"
             onClick={() => setOpenForm(true)}
             style={{ marginLeft: '10px' }}
+            size="small"
           >
-            New Image
-          </Button>
+            <AddAPhotoIcon />
+          </IconButton>
         )}
-        <Button
-          variant="outlined"
+        <IconButton
+          size="small"
+          aria-label="Back"
           color="primary"
           style={{ marginLeft: '10px' }}
           component={Link}
           to={admin ? '/admin' : '/'}
         >
-          Back
-        </Button>
+          <ArrowBackIcon />
+        </IconButton>
       </NavBar>
       <GridContainer>
         {images.filter(img => img.indexOf('.thumb') > -1).map(img => (
@@ -129,21 +139,18 @@ const Images = ({
         ))}
       </GridContainer>
       <Dialog
-        fullWidth
-        maxWidth="lg"
+        fullScreen
         open={!!selectedImg}
         onClose={() => setSelectedImg(null)}
       >
-        <DialogContent>
-          <Paper>
-            <img
-              height="100%"
-              width="100%"
-              src={buildFullImageUrl(folder, selectedImg)}
-              alt={selectedImg}
-              style={{ objectFit: 'contain' }}
-            />
-          </Paper>
+        <DialogContent className={classes.imageDialog}>
+          <img
+            height="100%"
+            width="100%"
+            src={buildFullImageUrl(folder, selectedImg)}
+            alt={selectedImg}
+            style={{ objectFit: 'contain' }}
+          />
         </DialogContent>
         <DialogActions>
           <Button
@@ -186,4 +193,4 @@ const Images = ({
   )
 }
 
-export default Images
+export default withStyles(styles)(Images)
