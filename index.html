@@ -27,4 +27,23 @@
     <br />
     <a class="link mail" href="mailto:peter@peterjlee.com" href="/now">📧</a>
   </body>
+  <script>
+    "use strict";
+    !function() {
+      var t = window.anneDesk = [];
+      if (!t.init) {
+        if (t.invoked) return void (window.console && console.error && console.error("Annedesk snippet included twice."));
+        t.invoked = !0,
+          t.load = function(t) {
+            anneDesk.appId = t;
+            var e = 3e5, n = Math.ceil(new Date() / e) * e, o = document.createElement("script");
+            o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = 'https://widget.annedesk.com/loader.js';
+            var i = document.getElementsByTagName("script")[0];
+            i.parentNode.insertBefore(o, i);
+          };
+      }
+    }();
+    anneDesk.SNIPPET_VERSION = '0.0.1';
+    anneDesk.load('4fe88ca8-b2cd-445c-bc32-5ab0ab2eb53b');
+</script>
 </html>
