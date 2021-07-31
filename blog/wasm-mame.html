@@ -1,0 +1,53 @@
+# Mame + wasm
+
+## Objective
+
+Play MAME with your friends withvia WebRTC
+
+## Overview
+
+To run MAME as a web application and play with a peer, we need three different services
+[Signaling backend server](https://github.com/ins429/playma_me_signaling)
+[Coturn backend server](https://github.com/ins429/playma_me_signaling/tree/master/coturn)
+Frontend, Client app running MAME emulator(WASM) and connecting peers via webRTC
+
+### Prerequisite
+It is good to have some basic knowledge on following technologies
+- WebRTC
+- React
+- Web Assembly(WASM)
+- Elixir
+- GraphQL, Apollo, Absinthe(elixir)
+
+
+References:
+https://www.knoats.com/books/self-hosted-applications/page/mame-web-application
+https://www.html5rocks.com/en/tutorials/webrtc/infrastructure/
+
+### Compiling MAME
+
+Follow instructions in https://docs.mamedev.org/initialsetup/compilingmame.html.
+Once you are set and able to compile MAME drivers with Emscripten, you can select drivers you want and compile it.
+
+
+### Signaling server
+
+https://github.com/ins429/playma_me_signaling
+
+Peers interact with a signaling server to share the handshakes and start a direct peer-to-peer transmission.
+
+### Coturn server
+
+https://github.com/ins429/playma_me_signaling/tree/master/coturn
+
+A way to solve firewall problems which can cut the direct WebRTC traffic is to use a TURN server.
+It has a public address, so both peers can interact with TURN server even behind firewalls.
+So when no direct peer-to-peer connection available,
+TURN server transmits audio/video streams of both peers just like a common media server.
+
+Docker container.
+
+
+### React App
+
+Frontend application
